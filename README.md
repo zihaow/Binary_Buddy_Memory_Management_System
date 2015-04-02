@@ -9,3 +9,6 @@ NULL pointer if there is no free space on the current memory block.
 - void release_memory( void *p ) — release memory partition referenced by pointer “p” back to free space.
 
 - void end_memory( void ) — print out memory leaks and release those leaks. 
+
+LICENSE
+Licensed under MIT: (http://opensource.org/licenses/MIT)
