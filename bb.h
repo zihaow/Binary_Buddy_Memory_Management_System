@@ -1,5 +1,9 @@
-/* bb.h header file for bb.c
- * Created by Zihao Wu.
+/* =========================================================================================================
+ * bb.h header file for bb.c
+ * =========================================================================================================
+ * Copyright 2013-2015 Zihao Wu.
+ * Licensed under MIT (https://github.com/zihaow/Binary_Buddy_Memory_Management_System/blob/master/LICENSE )
+ * =========================================================================================================
  */
 
 #ifndef _bb_h_

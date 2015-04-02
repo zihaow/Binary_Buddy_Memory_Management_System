@@ -1,6 +1,11 @@
-/* bb.c 
+/* =========================================================================================================
+ * bb.c
+ * =========================================================================================================
  * bb stands for 'binary buddies'. Simper memory management system based on binary buddies.
+ * Copyright 2013-2015 Zihao Wu.
+ * Licensed under MIT (https://github.com/zihaow/Binary_Buddy_Memory_Management_System/blob/master/LICENSE )
  * Created by Zihao Wu.
+ * =========================================================================================================
  */
 
 #include "bb.h"
@@ -71,16 +76,19 @@ int Best_fit(int partition){
     /* temp pointer points to our memory patition. */
     void *temp = NULL;
     
+    //printf("size **** is %d\n", partition);
+    
     /* find the best position for partition to be allocated. */
     while(position < startMemory){
         temp = bbp + position*deepestBlockSize;
-        if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE && (((Buddy *)temp) -> size != 0) ){
-            if( (((Buddy *)temp) -> size == partition) && ( ((Buddy *)temp) -> side != SIDE_IS_LEFT) ){
-                result = position*deepestBlockSize;
-                break;
-            }
+        if( ((Buddy *)(void *)temp) -> isUsed == IS_USED_FALSE && (((Buddy *)(void *)temp) -> size >= partition)  ){
+            //printf("size **** is %d\n", (((Buddy *)(void *)temp) -> size));
+            
+            //printf("addrees before is %p\n", temp);
+            //addrees before is 0x7ff140404c10
             result = position*deepestBlockSize;
             break;
+            
         }
         position++;
     }
@@ -123,6 +131,8 @@ void *get_memory(int size) {
         deepestBlockSize = size;
     }
     
+    //printf("partition size is %d\n", partitionSize);
+    
     /* case when we don't have enough space for memory allication. */
     if(freeSpace < partitionSize*2){
         printf("free space is %d\n", freeSpace);
@@ -154,9 +164,9 @@ void *get_memory(int size) {
     temp = bbp + location;
     
     /* print the current block size. */
-    int result = 0;
-    result = (((Buddy *)temp) -> size);
-    printf("result is %d\n", result);
+    //int result = 0;
+    //result = (((Buddy *)temp) -> size);
+    //printf("result is %d\n", result);
     
     /* case when we need to split a node since partition size is much smaller. */
     if( ((Buddy *)temp) -> size != partitionSize ){
@@ -174,7 +184,6 @@ void *get_memory(int size) {
     
     /* assgin properties to our assigned memory block. */
     ((Buddy *)temp) -> isUsed = IS_USED_TRUE;
-    ((Buddy *)temp) -> side = SIDE_IS_RIGHT;
     ((Buddy *)temp) -> size = partitionSize;
     
     /* assign memory position to be returned. */
@@ -187,16 +196,66 @@ void *get_memory(int size) {
     freeSpace = freeSpace - partitionSize;
     printf("free space is %d\n", freeSpace);
     
-    return bb;
+    return (void *)bb;
 }
 
 
-/* release_memory to release memory. */
+/* [release_memory] to release memory. */
 void release_memory(void *p) {
+    int bbSize = 0;
+    bbSize = (((Buddy *)p) -> size);
+    void *temp;
     
+    
+    if( ((Buddy *)p) -> side == SIDE_IS_LEFT){
+        
+        temp = p + bbSize;
+        //printf("addrees before is %p\n", temp);
+        if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE){
+            ((Buddy *)(void *)p) -> side = SIDE_IS_LEFT;
+            ((Buddy *)(void *)p) -> size = bbSize*2;
+            ((Buddy *)(void *)p) -> isUsed = IS_USED_FALSE;
+            freeSpace = freeSpace + bbSize*2;
+            
+        }
+        else{
+            ((Buddy *)(void *)p) -> isUsed = IS_USED_FALSE;
+            freeSpace = freeSpace + bbSize;
+            
+        }
+    }
+    
+    if( ((Buddy *)p) -> side == SIDE_IS_RIGHT){
+        temp = p - bbSize;
+        //printf("addrees before is %p\n", temp);
+        if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE){
+            p = temp;
+            ((Buddy *)(void *)p) -> side = SIDE_IS_LEFT;
+            ((Buddy *)(void *)p) -> size = bbSize*2;
+            ((Buddy *)(void *)p) -> isUsed = IS_USED_FALSE;
+            freeSpace = freeSpace + bbSize*2;
+        }
+        else{
+            ((Buddy *)(void *)p) -> isUsed = IS_USED_FALSE;
+            freeSpace = freeSpace + bbSize;
+        }
+    }
+    //printf("free space after memory release is %d\n", freeSpace);
+    printf("Released memory at %p\n", p);
 }
 
 /* end_memory to end memory and print out potential memory leak and then releases them. */
 void end_memory(void) {
+    void *temp = NULL;
     
+    for (int i=0; i< startMemory; i=i+deepestBlockSize){
+        temp = bbp + i;
+        if (((Buddy *)temp)->isUsed == IS_USED_TRUE){
+            printf("***** Memory leak at ***** %p\n", temp);
+            printf("\n");
+            
+            /* call release_memory(void *p) to release memory. */
+            release_memory(temp);
+        }
+    }
 }
