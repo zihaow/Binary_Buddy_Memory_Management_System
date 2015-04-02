@@ -4,7 +4,6 @@
  * bb stands for 'binary buddies'. Simper memory management system based on binary buddies.
  * Copyright 2013-2015 Zihao Wu.
  * Licensed under MIT (https://github.com/zihaow/Binary_Buddy_Memory_Management_System/blob/master/LICENSE )
- * Created by Zihao Wu.
  * =========================================================================================================
  */
 
