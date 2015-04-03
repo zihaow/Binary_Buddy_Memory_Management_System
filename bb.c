@@ -243,7 +243,7 @@ void *grow_memory(int size, void *p){
     /* cases when buddy to grow is on the left side. */
     if( (((Buddy *)p) -> side) == SIDE_IS_LEFT){
         for(int i=1; i< check_times; i++){
-            temp = p+i*prePartitionSize;
+            temp = p+i * prePartitionSize;
             //printf("address for grow is %p\n", temp);
             if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
@@ -305,11 +305,11 @@ void *grow_memory(int size, void *p){
     /* cases when buddy to grow is on the right side. */
     if( ((Buddy *)p) -> side == SIDE_IS_RIGHT){
         for(int i=1; i< check_times; i++){
-            temp = (void *)p-i*prePartitionSize;
+            temp = (void *)p-i * prePartitionSize;
             if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
             }
-            temp2 = (void *)p+i*prePartitionSize;
+            temp2 = (void *)p+i * prePartitionSize;
             if( ((Buddy *)temp2) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
             }
@@ -369,7 +369,188 @@ void *grow_memory(int size, void *p){
 }
 
 void *pregrow_memory(int size, void *p){
-    return NULL;
+    
+    int growSize = 0;
+    int partitionSize = 2;
+    int prePartitionSize = 2;
+    int count = 0;
+    void *temp =  NULL;
+    void *temp2 = NULL;
+    void *result = NULL;
+    void *from = p;
+    
+    
+    prePartitionSize = (((Buddy *)p) -> size);
+    growSize = size + (((Buddy *)p) -> size);
+    
+    /* cases when growsize is a power of 2. */
+    if (IS_POWER_OF_2(growSize)){
+        while(partitionSize != growSize){
+            
+            partitionSize = (int)pow(2.0, ((double)count));
+            count++;
+        }
+    }
+    
+    /* cases when growsize is not a power of 2.
+     Then the block size is the closest number to the power of 2. */
+    if (!IS_POWER_OF_2(growSize)){
+        while(partitionSize <= growSize){
+            
+            partitionSize = (int)pow(2.0, ((double)count));
+            count++;
+        }
+    }
+    
+    int check_times = 0;
+    int can_grow = 0;
+    check_times = (partitionSize-prePartitionSize)/prePartitionSize;
+    
+    /* cases when buddy to grow is on the left side. */
+    if( (((Buddy *)p) -> side) == SIDE_IS_LEFT){
+        
+        /* check on parts below the Buddy *p. */
+        for(int i=1; i< (check_times+1); i++){
+            temp = (void *)p+i * prePartitionSize;
+            if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE){
+                can_grow++;
+            }
+        }
+        
+        /* check on parts at the top of Buddy *p. */
+        for(int i=1; i< check_times; i++){
+            temp2 = (void *)p-i * prePartitionSize;
+            if( ((Buddy *)temp2) -> isUsed == IS_USED_FALSE ){
+                can_grow++;
+            }
+        }
+        
+        //printf("can_grow is %d\n", can_grow);
+        //if( can_grow == 0){
+          //  printf("Cannot peform pre_grow since there is no space. \n");
+           // return NULL;
+        //}
+        //printf("check_times is  %d\n", check_times);
+        
+        /* this means that we have enoug space to grow on p's current address. */
+        if( can_grow == (check_times*2) && can_grow != 0 ){
+            
+            p = (void *)p - (prePartitionSize * check_times);
+            
+            /* set the properties for "((Buddy *)p)". */
+            (((Buddy *)p) -> size) = partitionSize;
+            (((Buddy *)p) -> side) = SIDE_IS_LEFT;
+            (((Buddy *)p) -> isUsed) = IS_USED_TRUE;
+            
+            /* set the properties for "((Buddy *)p)"'s buddy, which is the
+             one on its right. */
+            temp = (void *)from + prePartitionSize;
+            ((Buddy *)temp) -> side = SIDE_IS_RIGHT;
+            ((Buddy *)temp) -> size = partitionSize;
+            ((Buddy *)temp) -> isUsed = IS_USED_FALSE;
+            
+            result = p;
+            freeSpace = freeSpace - prePartitionSize;
+        }
+        else{
+            
+            /* create a new buddy. */
+            Buddy *new = p;
+            
+            int position = 0;
+            position = Best_fit(partitionSize);
+            
+            //printf("Position is %d\n", position);
+            
+            if(position == 0){
+                printf("No enough space to grow. \n");
+            }
+            else{
+                /* set the properties for "((Buddy *)p)". */
+                ((Buddy *)new) -> side = SIDE_IS_LEFT;
+                ((Buddy *)new) -> size = partitionSize;
+                new = (void *)p + position;
+                ((Buddy *)new) -> isUsed = IS_USED_TRUE;
+                
+                /* set the properties for "((Buddy *)p)"'s buddy, which is the
+                 one on its right. */
+                temp2 = (void *)p + position + partitionSize;
+                ((Buddy *)temp2) -> side = SIDE_IS_RIGHT;
+                ((Buddy *)temp2) -> size = partitionSize;
+                ((Buddy *)temp2) -> isUsed = IS_USED_FALSE;
+                
+                result = new;
+                freeSpace = freeSpace - partitionSize;
+            }
+        }
+        
+    }
+    
+    /* cases when buddy to grow is on the right side. */
+    if( (((Buddy *)p) -> side) == SIDE_IS_RIGHT){
+        
+        check_times = 2*check_times + 1;
+        
+        for(int i=1; i< check_times; i++){
+            temp = (void *)p-i * prePartitionSize;
+            if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE ){
+                can_grow++;
+            }
+        }
+        
+        if( can_grow == check_times && can_grow != 0 ){
+            
+            p = (void *)p - ((check_times-1)/2) * prePartitionSize;
+            
+            /* set the properties for "((Buddy *)p)". */
+            (((Buddy *)(void *)p) -> size) = partitionSize;
+            (((Buddy *)(void *)p) -> side) = SIDE_IS_RIGHT;
+            (((Buddy *)(void *)p) -> isUsed) = IS_USED_TRUE;
+            
+            /* set the properties for "((Buddy *)p)"'s buddy, which is the
+             one on its right. */
+            temp2 = (void *)p - check_times * prePartitionSize;
+            ((Buddy *)temp2) -> side = SIDE_IS_LEFT;
+            ((Buddy *)temp2) -> size = partitionSize;
+            ((Buddy *)temp2) -> isUsed = IS_USED_FALSE;
+            
+            result = p;
+            freeSpace = freeSpace - prePartitionSize;
+        }
+        else{
+            /* create a new buddy. */
+            Buddy *new = p;
+            
+            int position = 0;
+            position = Best_fit(partitionSize);
+            
+            if(position == 0){
+                printf("No enough space to grow. \n");
+            }
+            else{
+                
+                /* set the properties for "((Buddy *)p)". */
+                ((Buddy *)new) -> side = SIDE_IS_LEFT;
+                ((Buddy *)new) -> size = partitionSize;
+                new = (void *)p + position;
+                ((Buddy *)new) -> isUsed = IS_USED_TRUE;
+                
+                /* release the previous memory. */
+                release_memory(p);
+                
+                /* set the properties for "((Buddy *)p)"'s buddy, which is the
+                 one on its right. */
+                temp2 = (void *)p + position + partitionSize;
+                ((Buddy *)temp2) -> side = SIDE_IS_RIGHT;
+                ((Buddy *)temp2) -> size = partitionSize;
+                ((Buddy *)temp2) -> isUsed = IS_USED_FALSE;
+                
+                result = new;
+                freeSpace = freeSpace - prePartitionSize;
+            }
+        }
+    }
+    return result;
 }
 
 

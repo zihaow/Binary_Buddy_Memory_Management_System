@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     
     
     test *t3 = get_memory(8);
-    //grow_memory(12, t2);
+    pregrow_memory(12, t2);
     //test *t3 = get_memory((sizeof(test)));
     printf("Memory address for t3 is %p\n", (void *)t3);
     printf("--------------------------------\n");
