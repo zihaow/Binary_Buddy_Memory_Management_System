@@ -32,7 +32,6 @@ int start_memory(int size) {
         freeSpace = size;
         printf("address is %p\n", bbp);
         
-        
         Buddy *bb = bbp;
         bb -> size = size;
         bb -> isUsed = IS_USED_FALSE;
@@ -60,7 +59,6 @@ void split_node(Buddy *bb){
     
     bb -> size = (bb -> size)/2;
     
-    
     printf("current address is %p\n", new);
     printf("total size is %d\n", (new->size));
     printf("Side is %d\n", (new->side));
@@ -83,7 +81,6 @@ int Best_fit(int partition){
             
             result = position*deepestBlockSize;
             break;
-            
         }
         position++;
     }
@@ -158,11 +155,11 @@ void *get_memory(int size) {
     
     /* cases when we need to split a node since partition size is much smaller. */
     if( ((Buddy *)temp) -> size != partitionSize ){
-        //printf("Spliting nodes. \n");
         int split_times = 0;
         split_times = (((Buddy *)temp) -> size)/partitionSize;
+        int i =0;
         
-        for(int i =0; i< split_times/2;i++){
+        for(i =0; i< split_times/2;i++){
             split_node(temp);
             printf("Spliting nodes. \n");
             if( ((Buddy *)temp) -> size == partitionSize ){
@@ -227,9 +224,10 @@ void *grow_memory(int size, void *p){
     
     /* cases when buddy to grow is on the left side. */
     if( (((Buddy *)p) -> side) == SIDE_IS_LEFT){
-        for(int i=1; i< check_times; i++){
+        int i = 0;
+        for(i = 1; i< check_times; i++){
             temp = p+i * prePartitionSize;
-            //printf("address for grow is %p\n", temp);
+            
             if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
             }
@@ -286,7 +284,8 @@ void *grow_memory(int size, void *p){
     
     /* cases when buddy to grow is on the right side. */
     if( ((Buddy *)p) -> side == SIDE_IS_RIGHT){
-        for(int i=1; i< check_times; i++){
+        int i = 0;
+        for(i = 1; i < check_times; i++){
             temp = (void *)p-i * prePartitionSize;
             if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
@@ -390,9 +389,10 @@ void *pregrow_memory(int size, void *p){
     
     /* cases when buddy to grow is on the left side. */
     if( (((Buddy *)p) -> side) == SIDE_IS_LEFT){
+        int i = 0;
         
         /* check on parts below the Buddy *p. */
-        for(int i=1; i< (check_times+1); i++){
+        for(i = 1; i< (check_times+1); i++){
             temp = (void *)p+i * prePartitionSize;
             if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE){
                 can_grow++;
@@ -400,7 +400,7 @@ void *pregrow_memory(int size, void *p){
         }
         
         /* check on parts at the top of Buddy *p. */
-        for(int i=1; i< check_times; i++){
+        for(i = 1; i< check_times; i++){
             temp2 = (void *)p-i * prePartitionSize;
             if( ((Buddy *)temp2) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
@@ -456,15 +456,14 @@ void *pregrow_memory(int size, void *p){
                 freeSpace = freeSpace - partitionSize;
             }
         }
-        
     }
     
     /* cases when buddy to grow is on the right side. */
     if( (((Buddy *)p) -> side) == SIDE_IS_RIGHT){
         
         check_times = 2*check_times + 1;
-        
-        for(int i=1; i< check_times; i++){
+        int i = 0;
+        for(i = 1; i< check_times; i++){
             temp = (void *)p-i * prePartitionSize;
             if( ((Buddy *)temp) -> isUsed == IS_USED_FALSE ){
                 can_grow++;
@@ -572,8 +571,8 @@ void release_memory(void *p) {
 /* end_memory to end memory and print out potential memory leak and then releases them. */
 void end_memory(void) {
     void *temp = NULL;
-    
-    for (int i=0; i< startMemory; i=i+deepestBlockSize){
+    int i = 0;
+    for (i = 0; i< startMemory; i=i+deepestBlockSize){
         temp = bbp + i;
         if (((Buddy *)temp)->isUsed == IS_USED_TRUE){
             printf("***** Memory leak at ***** %p\n", temp);
