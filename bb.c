@@ -79,10 +79,7 @@ int Best_fit(int partition){
     while(position < startMemory){
         temp = bbp + position*deepestBlockSize;
         if( ((Buddy *)(void *)temp) -> isUsed == IS_USED_FALSE && (((Buddy *)(void *)temp) -> size >= partition)  ){
-            //printf("size **** is %d\n", (((Buddy *)(void *)temp) -> size));
             
-            //printf("addrees before is %p\n", temp);
-            //addrees before is 0x7ff140404c10
             result = position*deepestBlockSize;
             break;
             
@@ -187,19 +184,7 @@ void *get_memory(int size) {
     /* calculate the free space left to be allocated. */
     freeSpace = freeSpace - partitionSize;
     printf("free space is %d\n", freeSpace);
-    /*
-    if(counter == 4){
-        void *eap = NULL;
-        eap = bbp + 64;
-        int sidesis =0;
-        int bbas = 0;
-        bbas = (((Buddy *)eap) -> size);
-        sidesis = (((Buddy *)eap) -> side);
-        
-        printf("*******dvw oh mother fucker. %d\n", sidesis);
-        
-    }
-    */
+    
     return (void *)bb;
 }
 
@@ -249,9 +234,6 @@ void *grow_memory(int size, void *p){
                 can_grow++;
             }
         }
-        
-        //printf("can_grow is %d\n", can_grow);
-        //printf("check_times is  %d\n", check_times);
         
         /* this means that we have enoug space to grow on p's current address. */
         if( can_grow == (check_times-1)){
@@ -343,7 +325,7 @@ void *grow_memory(int size, void *p){
                 printf("No enough space to grow. \n");
             }
             else{
-                //printf("Enough space to grow. \n");
+                
                 /* set the properties for "((Buddy *)p)". */
                 ((Buddy *)new) -> side = SIDE_IS_LEFT;
                 ((Buddy *)new) -> size = partitionSize;
@@ -425,13 +407,6 @@ void *pregrow_memory(int size, void *p){
             }
         }
         
-        //printf("can_grow is %d\n", can_grow);
-        //if( can_grow == 0){
-          //  printf("Cannot peform pre_grow since there is no space. \n");
-           // return NULL;
-        //}
-        //printf("check_times is  %d\n", check_times);
-        
         /* this means that we have enoug space to grow on p's current address. */
         if( can_grow == (check_times*2) && can_grow != 0 ){
             
@@ -459,8 +434,6 @@ void *pregrow_memory(int size, void *p){
             
             int position = 0;
             position = Best_fit(partitionSize);
-            
-            //printf("Position is %d\n", position);
             
             if(position == 0){
                 printf("No enough space to grow. \n");
