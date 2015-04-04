@@ -77,6 +77,7 @@ int Best_fit(int partition){
     
     /* find the best position for partition to be allocated. */
     while(position < startMemory){
+        
         temp = bbp + position*deepestBlockSize;
         if( ((Buddy *)(void *)temp) -> isUsed == IS_USED_FALSE && (((Buddy *)(void *)temp) -> size >= partition)  ){
             
@@ -112,7 +113,7 @@ void *get_memory(int size) {
             partitionSize = (int)pow(2.0, ((double)count));
             count++;
         }
-        deepestBlockSize = size;
+        deepestBlockSize = partitionSize;
     }
     
     /* cases when size is not a power of 2. Then the block size is the closest number to the power of 2. */
@@ -122,7 +123,7 @@ void *get_memory(int size) {
             partitionSize = (int)pow(2.0, ((double)count));
             count++;
         }
-        deepestBlockSize = size;
+        deepestBlockSize = partitionSize;
     }
     
     /* cases when we don't have enough space for memory allication. */
@@ -150,8 +151,6 @@ void *get_memory(int size) {
         }
     }
     
-    
-    
     /* find the best location for memory allocation. */
     int location = 0;
     location = Best_fit(partitionSize);
@@ -159,6 +158,7 @@ void *get_memory(int size) {
     
     /* cases when we need to split a node since partition size is much smaller. */
     if( ((Buddy *)temp) -> size != partitionSize ){
+        //printf("Spliting nodes. \n");
         int split_times = 0;
         split_times = (((Buddy *)temp) -> size)/partitionSize;
         
