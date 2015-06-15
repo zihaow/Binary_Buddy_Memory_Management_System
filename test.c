@@ -17,6 +17,8 @@ typedef struct {
 
 int main(int argc, char **argv) {
     
+
+
     int startMemory = 0;
     int memorySize = 0;
     int count = 0;
@@ -26,7 +28,6 @@ int main(int argc, char **argv) {
     printf("Enter the memory size:");
     scanf("%d",&startMemory);
     start_memory(startMemory);
-    
     
     while(1){
 
@@ -53,9 +54,13 @@ int main(int argc, char **argv) {
         count++;
     }
     
+
     
     // initialize memory size to 512.
     /*
+=======
+    // initialize memory size to 512.
+>>>>>>> origin/master
     start_memory(512);
     printf("\n");
 
@@ -68,17 +73,20 @@ int main(int argc, char **argv) {
     printf("Memory address for t2 is %p\n", (void *)t2);
     printf("--------------------------------\n");
     
-    
     test *t3 = get_memory(8);
+<<<<<<< HEAD
     //pregrow_memory(12, t2);
     //test *t3 = get_memory((sizeof(test)));
+=======
+    pregrow_memory(12, t2);
+>>>>>>> origin/master
     printf("Memory address for t3 is %p\n", (void *)t3);
     printf("--------------------------------\n");
     
     test *t4 = get_memory(8);
-    //grow_memory(12, t4);
     printf("Memory address for t4 is %p\n", (void *)t4);
     printf("--------------------------------\n");
+<<<<<<< HEAD
     
     //release_memory(t4);
     
@@ -102,6 +110,8 @@ int main(int argc, char **argv) {
     printf("Memory address for t8 is %p\n", (void *)t8);
     printf("--------------------------------\n");
     */
+=======
+>>>>>>> origin/master
     
     /* to clean up all memory.*/
     //end_memory();
