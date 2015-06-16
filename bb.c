@@ -220,7 +220,7 @@ void *grow_memory(int size, void *p){
     
     int check_times = 0;
     int can_grow = 0;
-    check_times = (partitionSize*2)/prePartitionSize;
+    check_times = (partitionSize*2)/(prePartitionSize*2);
     
     /* cases when buddy to grow is on the left side. */
     if( (((Buddy *)p) -> side) == SIDE_IS_LEFT){
