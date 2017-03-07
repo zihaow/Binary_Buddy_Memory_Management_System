@@ -1,5 +1,5 @@
 # Binary_Buddy_Memory_Management_System
-Simper memory management system based on binary buddies
+Simple memory management system based on binary buddies
 
 - int start_memory(int size) — initialzie the binary buddies memory system with "size" bytes.
 
